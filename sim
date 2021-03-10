@@ -1,0 +1,62 @@
+#!/bin/csh -f
+#################
+set WORK_HOME = "/home/xiaotu/tmp/tools/UVM/modelsim/sim_dir"
+set TEST_TOP_NAME = "../tb/graycode_converter_tb.sv"
+set RTL_TOP_NAME   = "../rtl/graycode_converter.v"
+
+# include search path for modules
+set INC_DIRS = "+incdir+../tb"
+ 
+# library  search path for modules
+set LIB_DIRS = "-y ../tb"
+
+# top rtl file
+set RTL_TOP_FILE =  $RTL_TOP_NAME
+
+# test top file
+set TEST_TOP_FILE = $TEST_TOP_NAME
+
+echo "simulation top file = $TEST_TOP_FILE"
+echo "RTL top file 	  = $RTL_TOP_FILE"
+
+set VCS_FLAGS = "-sverilog \
+-debug_all"
+
+set VCS_FLAGS = "-sverilog \
+-debug_all \
+-full64 \
+-timescale=1ns/100ps \
++libext+.v+.sv \
+-P $NOVAS_HOME/share/PLI/VCS/LINUX64/verdi.tab \
+   $NOVAS_HOME/share/PLI/VCS/LINUX64/pli.a \
+-f ../rtl/filist.f \
+-R \
++nospecify \
++lint=DSFIF-L \
+-lca -kdb \
++notimingcheck \
++define+FSDB"
+#-notice –l ./sim.log \
+#+lint=TFIPC-L \
+#
+
+# define code coverage metrics
+set CM_COMPILE_FLAGS = "-cm line+cond+fsm+tgl \
+-cm_tgl mda"
+
+# set coverage test
+set CM_SIM_FLAGS = "-cm line+tgl+fsm+cond"
+# excute VCS sim at my VCS directory
+cd $WORK_HOME
+
+# compile using the HDL simulator to produce an executable programe
+#vcs $VCS_FLAGS $INC_DIRS $LIB_DIRS $CM_COMPILE_FLAGS $RTL_TOP_FILE $TEST_TOP_FILE
+vcs $VCS_FLAGS #$RTL_TOP_FILE $TEST_TOP_FILE
+
+# simulation
+./simv #-ucli -i ../script/vcs_ucli.tcl
+
+#DVE GUI coverage analysis
+#dve -cov -dir simv.vdb
+# generate html coverage analysis results
+# urg -dir simv.vdb -report both -full64

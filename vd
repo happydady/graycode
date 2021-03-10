@@ -1,0 +1,15 @@
+#!/bin/csh -f
+
+set WORK_HOME = "/home/xiaotu/tmp/tools/UVM/modelsim/sim_dir"
+
+#excute VCS sim at my directory
+cd $WORK_HOME
+
+#set verdi top and FSDB
+set VERI_TOP = "graycode_tb"
+set MY_FSDB  = "graycode.fsdb"
+
+verdi -sv -f ../rtl/filist.f \
+-top $VERI_TOP \
+-nologo \
+-ssf ../my_fsdb/$MY_FSDB
